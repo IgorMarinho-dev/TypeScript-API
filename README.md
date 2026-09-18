@@ -29,3 +29,7 @@ Aplicação a ser Construída - Sistema de Clínica Médica
 ### Criando a configuração do TypeScript
 
 * `npx tsc --init` — Cria o arquivo `tsconfig.json`, que define as configurações de compilação do TypeScript.
+
+### Criando a configuração do Docker
+
+* `docker compose up --build` — Cria e inicia os containers definidos no `docker-compose.yml`, reconstruindo as imagens do projeto antes de executá-los.
