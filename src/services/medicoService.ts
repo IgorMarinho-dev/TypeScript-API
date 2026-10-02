@@ -1,5 +1,9 @@
 import { MedicoRepository } from "../repositories/medicoRepository.js";
-import type { Medico } from "../repositories/medicoRepository.js";
+import type {
+  AtualizarMedico,
+  CriarMedico,
+  Medico,
+} from "../repositories/medicoRepository.js";
 
 export class MedicoService {
   private readonly medicoRepository: MedicoRepository;
@@ -8,23 +12,23 @@ export class MedicoService {
     this.medicoRepository = medicoRepository;
   }
 
-  listarMedicos(): Medico[] {
+  async listarMedicos(): Promise<Medico[]> {
     return this.medicoRepository.findAll();
   }
 
-  buscarMedicoPorId(id: number): Medico | undefined {
+  async buscarMedicoPorId(id: number): Promise<Medico | null> {
     return this.medicoRepository.findById(id);
   }
 
-  criarMedico(medico: Medico): Medico {
-    return this.medicoRepository.create(medico);
+  async criarMedico(dados: CriarMedico): Promise<Medico> {
+    return this.medicoRepository.create(dados);
   }
 
-  atualizarMedico(id: number, dados: Partial<Medico>): Medico | undefined {
+  async atualizarMedico(id: number, dados: AtualizarMedico): Promise<Medico | null> {
     return this.medicoRepository.update(id, dados);
   }
 
-  removerMedico(id: number): boolean {
+  async removerMedico(id: number): Promise<boolean> {
     return this.medicoRepository.delete(id);
   }
 }

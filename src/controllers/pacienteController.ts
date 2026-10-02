@@ -1,5 +1,8 @@
 import type { Request, Response } from "express";
-import type { Paciente } from "../repositories/pacienteRepository.js";
+import type {
+  AtualizarPaciente,
+  CriarPaciente,
+} from "../repositories/pacienteRepository.js";
 import { PacienteService } from "../services/pacienteService.js";
 
 export class PacienteController {
@@ -9,12 +12,13 @@ export class PacienteController {
     this.pacienteService = pacienteService;
   }
 
-  listar(req: Request, res: Response): void {
-    res.json(this.pacienteService.listarPacientes());
+  async listar(req: Request, res: Response): Promise<void> {
+    const pacientes = await this.pacienteService.listarPacientes();
+    res.json(pacientes);
   }
 
-  buscarPorId(req: Request, res: Response): void {
-    const paciente = this.pacienteService.buscarPacientePorId(Number(req.params.id));
+  async buscarPorId(req: Request, res: Response): Promise<void> {
+    const paciente = await this.pacienteService.buscarPacientePorId(Number(req.params.id));
 
     if (!paciente) {
       res.status(404).json({ message: "Paciente não encontrado" });
@@ -24,13 +28,16 @@ export class PacienteController {
     res.json(paciente);
   }
 
-  criar(req: Request<unknown, unknown, Paciente>, res: Response): void {
-    const paciente = this.pacienteService.criarPaciente(req.body);
+  async criar(req: Request<unknown, unknown, CriarPaciente>, res: Response): Promise<void> {
+    const paciente = await this.pacienteService.criarPaciente(req.body);
     res.status(201).json(paciente);
   }
 
-  atualizar(req: Request<{ id: string }, unknown, Partial<Paciente>>, res: Response): void {
-    const paciente = this.pacienteService.atualizarPaciente(Number(req.params.id), req.body);
+  async atualizar(
+    req: Request<{ id: string }, unknown, AtualizarPaciente>,
+    res: Response,
+  ): Promise<void> {
+    const paciente = await this.pacienteService.atualizarPaciente(Number(req.params.id), req.body);
 
     if (!paciente) {
       res.status(404).json({ message: "Paciente não encontrado" });
@@ -40,8 +47,8 @@ export class PacienteController {
     res.json(paciente);
   }
 
-  remover(req: Request, res: Response): void {
-    const removido = this.pacienteService.removerPaciente(Number(req.params.id));
+  async remover(req: Request, res: Response): Promise<void> {
+    const removido = await this.pacienteService.removerPaciente(Number(req.params.id));
 
     if (!removido) {
       res.status(404).json({ message: "Paciente não encontrado" });

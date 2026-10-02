@@ -1,4 +1,20 @@
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-clinica}
+      POSTGRES_USER: ${POSTGRES_USER:-clinica_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clinica_senha}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
     build:
       context: .
@@ -7,3 +23,10 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-clinica_user}:${POSTGRES_PASSWORD:-clinica_senha}@db:5432/${POSTGRES_DB:-clinica}?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,5 +1,9 @@
 import { PacienteRepository } from "../repositories/pacienteRepository.js";
-import type { Paciente } from "../repositories/pacienteRepository.js";
+import type {
+  AtualizarPaciente,
+  CriarPaciente,
+  Paciente,
+} from "../repositories/pacienteRepository.js";
 
 export class PacienteService {
   private readonly pacienteRepository: PacienteRepository;
@@ -8,23 +12,23 @@ export class PacienteService {
     this.pacienteRepository = pacienteRepository;
   }
 
-  listarPacientes(): Paciente[] {
+  async listarPacientes(): Promise<Paciente[]> {
     return this.pacienteRepository.findAll();
   }
 
-  buscarPacientePorId(id: number): Paciente | undefined {
+  async buscarPacientePorId(id: number): Promise<Paciente | null> {
     return this.pacienteRepository.findById(id);
   }
 
-  criarPaciente(paciente: Paciente): Paciente {
-    return this.pacienteRepository.create(paciente);
+  async criarPaciente(dados: CriarPaciente): Promise<Paciente> {
+    return this.pacienteRepository.create(dados);
   }
 
-  atualizarPaciente(id: number, dados: Partial<Paciente>): Paciente | undefined {
+  async atualizarPaciente(id: number, dados: AtualizarPaciente): Promise<Paciente | null> {
     return this.pacienteRepository.update(id, dados);
   }
 
-  removerPaciente(id: number): boolean {
+  async removerPaciente(id: number): Promise<boolean> {
     return this.pacienteRepository.delete(id);
   }
 }

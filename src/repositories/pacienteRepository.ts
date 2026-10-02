@@ -1,48 +1,64 @@
+import { prisma } from "../lib/prisma.js";
+
 export interface Paciente {
   id: number;
   nome: string;
   telefone: string;
 }
 
+export type CriarPaciente = Omit<Paciente, "id">;
+export type AtualizarPaciente = Partial<CriarPaciente>;
+
+const camposPaciente = {
+  id: true,
+  nome: true,
+  telefone: true,
+} as const;
+
 export class PacienteRepository {
-  private readonly pacientes: Paciente[] = [
-    { id: 1, nome: "André", telefone: "123456789" },
-    { id: 2, nome: "Maria", telefone: "987654321" },
-  ];
-
-  findAll(): Paciente[] {
-    return this.pacientes;
+  async findAll(): Promise<Paciente[]> {
+    return prisma.paciente.findMany({
+      select: camposPaciente,
+      orderBy: { id: "asc" },
+    });
   }
 
-  findById(id: number): Paciente | undefined {
-    return this.pacientes.find((paciente) => paciente.id === id);
+  async findById(id: number): Promise<Paciente | null> {
+    return prisma.paciente.findUnique({
+      where: { id },
+      select: camposPaciente,
+    });
   }
 
-  create(paciente: Paciente): Paciente {
-    this.pacientes.push(paciente);
-    return paciente;
+  async create(dados: CriarPaciente): Promise<Paciente> {
+    return prisma.paciente.create({
+      data: dados,
+      select: camposPaciente,
+    });
   }
 
-  update(id: number, dados: Partial<Paciente>): Paciente | undefined {
-    const indice = this.pacientes.findIndex((paciente) => paciente.id === id);
+  async update(id: number, dados: AtualizarPaciente): Promise<Paciente | null> {
+    const paciente = await this.findById(id);
 
-    if (indice === -1) {
-      return undefined;
+    if (!paciente) {
+      return null;
     }
 
-    const pacienteAtualizado = { ...this.pacientes[indice], ...dados };
-    this.pacientes[indice] = pacienteAtualizado;
-    return pacienteAtualizado;
+    return prisma.paciente.update({
+      where: { id },
+      data: dados,
+      select: camposPaciente,
+    });
   }
 
-  delete(id: number): boolean {
-    const indice = this.pacientes.findIndex((paciente) => paciente.id === id);
+  async delete(id: number): Promise<boolean> {
+    const paciente = await this.findById(id);
 
-    if (indice === -1) {
+    if (!paciente) {
       return false;
     }
 
-    this.pacientes.splice(indice, 1);
+    await prisma.paciente.delete({ where: { id } });
     return true;
   }
 }

@@ -1,5 +1,8 @@
 import type { Request, Response } from "express";
-import type { Medico } from "../repositories/medicoRepository.js";
+import type {
+  AtualizarMedico,
+  CriarMedico,
+} from "../repositories/medicoRepository.js";
 import { MedicoService } from "../services/medicoService.js";
 
 export class MedicoController {
@@ -9,12 +12,13 @@ export class MedicoController {
     this.medicoService = medicoService;
   }
 
-  listar(req: Request, res: Response): void {
-    res.json(this.medicoService.listarMedicos());
+  async listar(req: Request, res: Response): Promise<void> {
+    const medicos = await this.medicoService.listarMedicos();
+    res.json(medicos);
   }
 
-  buscarPorId(req: Request, res: Response): void {
-    const medico = this.medicoService.buscarMedicoPorId(Number(req.params.id));
+  async buscarPorId(req: Request, res: Response): Promise<void> {
+    const medico = await this.medicoService.buscarMedicoPorId(Number(req.params.id));
 
     if (!medico) {
       res.status(404).json({ message: "Médico não encontrado" });
@@ -24,13 +28,16 @@ export class MedicoController {
     res.json(medico);
   }
 
-  criar(req: Request<unknown, unknown, Medico>, res: Response): void {
-    const medico = this.medicoService.criarMedico(req.body);
+  async criar(req: Request<unknown, unknown, CriarMedico>, res: Response): Promise<void> {
+    const medico = await this.medicoService.criarMedico(req.body);
     res.status(201).json(medico);
   }
 
-  atualizar(req: Request<{ id: string }, unknown, Partial<Medico>>, res: Response): void {
-    const medico = this.medicoService.atualizarMedico(Number(req.params.id), req.body);
+  async atualizar(
+    req: Request<{ id: string }, unknown, AtualizarMedico>,
+    res: Response,
+  ): Promise<void> {
+    const medico = await this.medicoService.atualizarMedico(Number(req.params.id), req.body);
 
     if (!medico) {
       res.status(404).json({ message: "Médico não encontrado" });
@@ -40,8 +47,8 @@ export class MedicoController {
     res.json(medico);
   }
 
-  remover(req: Request, res: Response): void {
-    const removido = this.medicoService.removerMedico(Number(req.params.id));
+  async remover(req: Request, res: Response): Promise<void> {
+    const removido = await this.medicoService.removerMedico(Number(req.params.id));
 
     if (!removido) {
       res.status(404).json({ message: "Médico não encontrado" });
