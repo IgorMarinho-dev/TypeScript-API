@@ -11,6 +11,7 @@ model Paciente {
   id        Int      @id @default(autoincrement())
   nome      String
   telefone  String
+  consultas Consulta[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -21,6 +22,22 @@ model Medico {
   telefone      String
   especialidade String
   crm           String   @unique
+  consultas     Consulta[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model Consulta {
+  id         Int      @id @default(autoincrement())
+  data       DateTime
+  turno      String
+  medicoId   Int
+  pacienteId Int
+  medico     Medico   @relation(fields: [medicoId], references: [id])
+  paciente   Paciente @relation(fields: [pacienteId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([medicoId])
+  @@index([pacienteId])
 }
